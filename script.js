@@ -11,9 +11,13 @@ const Products = {
    * Sets up the query string for the GraphQL request
    * @returns {String} A GraphQL query string
    */
-  query: (numProducts) => `{
-    products (first: ${numProducts}) {
+  query: (numProducts, cursor) => `{
+    products (first: ${numProducts}, after: ${cursor}, query: "-tag:upsell_item") {
+      pageInfo {
+        hasNextPage
+      }
       edges {
+        cursor
         node {
           handle
           availableForSale
@@ -42,16 +46,17 @@ const Products = {
     const productsResponse = await fetch(Products.state.storeUrl, {
       method: "POST",
       headers: {
-
-        // Set up the request headers here
-
+        "Content-Type": Products.state.contentType,
+        "Accept": Products.state.accept,
+        "X-Shopify-Storefront-Access-Token": Products.state.accessToken
       },
       body: JSON.stringify({
-        query: Products.query()
+        query: Products.query(numProducts, cursor)
       })
     });
     const productsResponseJson = await productsResponse.json();
     Products.displayProducts(productsResponseJson);
+    return productsResponseJson;
   },
 
   /**
@@ -70,7 +75,16 @@ const Products = {
   initialize: () => {
     const numProducts = 3;
     document.getElementById('fetchProducts').addEventListener('click', function handler() {
-      Products.handleFetch(numProducts);
+      this.removeEventListener('click', handler);
+      let cursor = '"' + this.dataset.cursor + '"';
+      if(this.dataset.cursor === undefined) cursor = null;
+      Products.handleFetch(numProducts, cursor).then(response => {
+        const { edges, pageInfo } = response.data.products;
+        if(pageInfo.hasNextPage) {
+          this.dataset.cursor = edges[numProducts-1].cursor;
+          this.addEventListener('click', handler);
+        }
+      });
     });
   },
 };
