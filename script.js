@@ -60,13 +60,49 @@ const Products = {
   },
 
   /**
+  * Takes an image's URL and modifies it to a given size
+  * @param {String} url
+  * @param {Number} size
+  * @returns {String}
+  */
+  resizeImage: (url, size) => {
+    const index = url.lastIndexOf('.');
+    return url.slice(0, index) + `_${size}x${size}` + url.slice(index);
+  },
+
+  /**
    * Takes a JSON representation of the products and renders cards to the DOM
    * @param {Object} productsJson
    */
   displayProducts: productsJson => {
-
-    // Render the products here
-
+    const { edges } = productsJson.data.products;
+    const container = document.getElementById('cardsContainer');
+    edges.map(product => {
+      const { handle, availableForSale, title, tags, priceRange, featuredImage } = product.node;
+      if(availableForSale){
+        let imageUrl = '';
+        if(featuredImage !== null){
+          imageUrl = Products.resizeImage(featuredImage.url, 350);
+        }
+        let price = `$${priceRange.minVariantPrice.amount}`;
+        if(priceRange.minVariantPrice.amount !== priceRange.maxVariantPrice.amount){
+          price += `-$${priceRange.maxVariantPrice.amount}`;
+        }
+        let spanTags = '';
+        tags.forEach(tag => {
+          spanTags += `<span class="card__tags-tag">${tag}</span>`;
+        });
+        const card = `
+          <div class="card">
+            <div class="card__tags">${spanTags}</div>
+            <div class="card__image" style="background-image:url(${imageUrl});"></div>
+            <label class="card__title">${title}</label>
+            <label class="card__price">${price}</label>
+            <a href="/products/${handle}" class="card__button"><label>Shop now</label></a>
+          </div>`;
+        container.innerHTML += card;
+      }
+    })
   },
 
   /**
