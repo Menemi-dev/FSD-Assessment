@@ -28,3 +28,81 @@ body {
 }
 
 // Add your scss below this line
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Grotesk:wght@400;700&display=swap");
+$primary-color: #ffc700;
+$grey: #333333;
+$breakpoint: 1200px;
+$primary-font: "Space Grotesk", sans-serif;
+$secondary-font: "Inter", sans-serif;
+
+.cards-container {
+  display: grid;
+  grid-gap: 22px;
+  margin: 235px auto;
+  justify-items: center;
+  @media (min-width: $breakpoint) {
+    grid-template-columns: repeat(3, 1fr);
+    width: 932px;
+    margin: 235px 100px;
+  }
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  border: 1px solid $primary-color;
+  width: 260px;
+  height: 454px;
+  padding: 16px;
+  font-family: $primary-font;
+  font-weight: 400;
+  font-size: 20px;
+  &__tags {
+    position: absolute;
+    top: 27px;
+    left: 0;
+    &-tag {
+      display: inline-block;
+      background-color: $primary-color;
+      text-transform: uppercase;
+      padding: 10px;
+      margin: 0 10px 10px 0;
+      font-family: $secondary-font;
+    }
+  }
+  &__image {
+    height: 324.68px;
+    width: 100%;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  &__title {
+    margin-top: 21px;
+  }
+  &__price {
+    font-family: $secondary-font;
+    font-weight: 700;
+    font-size: 18px;
+    margin-top: 21px;
+  }
+  &__button {
+    display: flex;
+    background-color: $primary-color;
+    color: $grey;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14.32px;
+    margin-top: 21px;
+    label {
+      padding: 12.29px;
+      cursor: pointer;
+      &::after {
+        content: url(arrow.svg);
+        padding-left: 7.37px;
+      }
+    }
+  }
+}

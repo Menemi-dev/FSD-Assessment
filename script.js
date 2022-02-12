@@ -42,7 +42,7 @@ const Products = {
   /**
    * Fetches the products via GraphQL then runs the display function
    */
-  handleFetch: async () => {
+  handleFetch: async (numProducts, cursor) => {
     const productsResponse = await fetch(Products.state.storeUrl, {
       method: "POST",
       headers: {
