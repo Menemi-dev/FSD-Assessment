@@ -1,7 +1,7 @@
 const Products = {
 
   state: {
-    storeUrl: "https://api-demo-store.myshopify.com/api/2020-07/graphql",
+    storeUrl: "https://api-demo-store.myshopify.com/api/2022-01/graphql",
     contentType: "application/json",
     accept: "application/json",
     accessToken: "b8385e410d5a37c05eead6c96e30ccb8"
@@ -11,11 +11,29 @@ const Products = {
    * Sets up the query string for the GraphQL request
    * @returns {String} A GraphQL query string
    */
-  query: () => `
-
-    Add your GraphQL query here
-    
-  `,
+  query: (numProducts) => `{
+    products (first: ${numProducts}) {
+      edges {
+        node {
+          handle
+          availableForSale
+          title
+          tags
+          priceRange{
+            maxVariantPrice {
+              amount
+            }
+            minVariantPrice {
+              amount
+            }
+          }
+          featuredImage {
+            url
+          }
+        }
+      }
+    }
+  }`,
 
   /**
    * Fetches the products via GraphQL then runs the display function
@@ -27,7 +45,7 @@ const Products = {
 
         // Set up the request headers here
 
-      }, 
+      },
       body: JSON.stringify({
         query: Products.query()
       })
@@ -38,7 +56,7 @@ const Products = {
 
   /**
    * Takes a JSON representation of the products and renders cards to the DOM
-   * @param {Object} productsJson 
+   * @param {Object} productsJson
    */
   displayProducts: productsJson => {
 
@@ -50,11 +68,11 @@ const Products = {
    * Sets up the click handler for the fetch button
    */
   initialize: () => {
-
-    // Add the click handler here
-
-  }
-
+    const numProducts = 3;
+    document.getElementById('fetchProducts').addEventListener('click', function handler() {
+      Products.handleFetch(numProducts);
+    });
+  },
 };
 
 document.addEventListener('DOMContentLoaded', () => {
