@@ -9,6 +9,8 @@ const Products = {
 
   /**
    * Sets up the query string for the GraphQL request
+   * @param {Number} numProducts
+   * @param {String} cursor
    * @returns {String} A GraphQL query string
    */
   query: (numProducts, cursor) => `{
@@ -41,6 +43,9 @@ const Products = {
 
   /**
    * Fetches the products via GraphQL then runs the display function
+   * @param {Number} numProducts
+   * @param {String} cursor
+   * @returns {Object}
    */
   handleFetch: async (numProducts, cursor) => {
     const productsResponse = await fetch(Products.state.storeUrl, {
@@ -71,38 +76,49 @@ const Products = {
   },
 
   /**
+  * Creates a card structure using the product's data
+  * @param {Object} product
+  * @returns {String}
+  */
+  createCard: (product) => {
+    const { handle, availableForSale, title, tags, priceRange, featuredImage } = product.node;
+    if(availableForSale){
+      let imageUrl = ''; //TODO: add a default 'no image' url
+      if(featuredImage !== null){
+        imageUrl = Products.resizeImage(featuredImage.url, 350);
+      }
+      let price = `&#36;${priceRange.minVariantPrice.amount}`;
+      if(priceRange.minVariantPrice.amount !== priceRange.maxVariantPrice.amount){
+        price += `-&#36;${priceRange.maxVariantPrice.amount}`;
+      }
+      let spanTags = '';
+      tags.forEach(tag => {
+        spanTags += `<span class="card__tags-tag">${tag}</span>`;
+      });
+      return `
+        <div class="card">
+          <div class="card__tags">${spanTags}</div>
+          <div class="card__image" style="background-image:url(${imageUrl});"></div>
+          <label class="card__title">${title}</label>
+          <label class="card__price">${price}</label>
+          <a href="/products/${handle}" class="card__button"><label>Shop now</label></a>
+        </div>`;
+    }
+    return '';
+  },
+
+  /**
    * Takes a JSON representation of the products and renders cards to the DOM
    * @param {Object} productsJson
    */
   displayProducts: productsJson => {
     const { edges } = productsJson.data.products;
-    const container = document.getElementById('cardsContainer');
-    edges.map(product => {
-      const { handle, availableForSale, title, tags, priceRange, featuredImage } = product.node;
-      if(availableForSale){
-        let imageUrl = '';
-        if(featuredImage !== null){
-          imageUrl = Products.resizeImage(featuredImage.url, 350);
-        }
-        let price = `$${priceRange.minVariantPrice.amount}`;
-        if(priceRange.minVariantPrice.amount !== priceRange.maxVariantPrice.amount){
-          price += `-$${priceRange.maxVariantPrice.amount}`;
-        }
-        let spanTags = '';
-        tags.forEach(tag => {
-          spanTags += `<span class="card__tags-tag">${tag}</span>`;
-        });
-        const card = `
-          <div class="card">
-            <div class="card__tags">${spanTags}</div>
-            <div class="card__image" style="background-image:url(${imageUrl});"></div>
-            <label class="card__title">${title}</label>
-            <label class="card__price">${price}</label>
-            <a href="/products/${handle}" class="card__button"><label>Shop now</label></a>
-          </div>`;
-        container.innerHTML += card;
-      }
-    })
+    const container = document.getElementById('productsGrid');
+    let cards = '';
+    edges.forEach(product => {
+      cards += Products.createCard(product);
+    });
+    container.innerHTML += cards;
   },
 
   /**
