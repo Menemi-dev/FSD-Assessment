@@ -42,7 +42,7 @@ const Products = {
   }`,
 
   /**
-   * Fetches the products via GraphQL then runs the display function
+   * Fetches the products via GraphQL
    * @param {Number} numProducts
    * @param {String} cursor
    * @returns {Object}
@@ -59,9 +59,7 @@ const Products = {
         query: Products.query(numProducts, cursor)
       })
     });
-    const productsResponseJson = await productsResponse.json();
-    Products.displayProducts(productsResponseJson);
-    return productsResponseJson;
+    return await productsResponse.json()
   },
 
   /**
@@ -112,10 +110,9 @@ const Products = {
    * @param {Object} productsJson
    */
   displayProducts: productsJson => {
-    const { edges } = productsJson.data.products;
     const container = document.getElementById('productsGrid');
     let cards = '';
-    edges.forEach(product => {
+    productsJson.forEach(product => {
       cards += Products.createCard(product);
     });
     container.innerHTML += cards;
@@ -132,6 +129,7 @@ const Products = {
       if(this.dataset.cursor === undefined) cursor = null;
       Products.handleFetch(numProducts, cursor).then(response => {
         const { edges, pageInfo } = response.data.products;
+        Products.displayProducts(edges);
         if(pageInfo.hasNextPage) {
           this.dataset.cursor = edges[numProducts-1].cursor;
           this.addEventListener('click', handler);
