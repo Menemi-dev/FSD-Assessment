@@ -68,7 +68,7 @@ body {
           align-items: flex-start;
   position: relative;
   border: 1px solid #ffc700;
-  width: 260px;
+  width: 262px;
   height: 454px;
   padding: 16px;
   font-family: "Space Grotesk", sans-serif;
@@ -108,6 +108,7 @@ body {
   font-weight: 700;
   font-size: 18px;
   margin-top: 21px;
+  line-height: 15px;
 }
 
 .card__button {
@@ -126,6 +127,7 @@ body {
 .card__button label {
   padding: 12.29px;
   cursor: pointer;
+  line-height: 12px;
 }
 
 .card__button label::after {
